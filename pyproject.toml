@@ -1,0 +1,29 @@
+[project]
+name = "cybersec-llm-evaluation"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = []
+readme = "README.md"
+license = {file = "LICENSE"}
+
+[project.authors]
+name = "Jakub Pluta"
+email = "jakubpluta@proton.me"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "UP", "B", "SIM", "I"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "ruff>=0.13.1",
+]
