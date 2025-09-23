@@ -2,6 +2,18 @@ default_language_version:
   python: python3.11
 
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.8.19
     hooks:
@@ -15,11 +27,11 @@ repos:
       - id: ruff-format
         types_or: [ python, pyi ]
   - repo: local
-    # it should be installed using uv sync
+    # it should be installed using uv sync. it requires uv to be installed in $PATH!
     hooks:
       - id: mypy
         name: mypy
         entry: uv run mypy
-        args: [ ]
+        args: []
         language: system
-        types: [ python ]
+        types: [python]
