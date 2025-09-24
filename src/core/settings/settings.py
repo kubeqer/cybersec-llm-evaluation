@@ -8,4 +8,6 @@ load_dotenv(find_dotenv(".env"))
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
     hf_token: str = Field(alias="HF_TOKEN")
-    provider: str = Field(alias="PROVIDER")
+
+
+settings = Settings()  # type: ignore
