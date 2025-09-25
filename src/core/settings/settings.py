@@ -8,6 +8,9 @@ load_dotenv(find_dotenv(".env"))
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
     hf_token: str = Field(alias="HF_TOKEN")
+    anthropic_token: str = Field(alias="ANTHROPIC_TOKEN")
+    google_apikey: str = Field(alias="GOOGLE_APIKEY")
+    openai_apikey: str = Field(alias="OPENAI_APIKEY")
 
 
 settings = Settings()  # type: ignore
