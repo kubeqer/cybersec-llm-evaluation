@@ -9,6 +9,7 @@ dependencies = [
     "deepeval>=3.5.6",
     "google-genai>=1.38.0",
     "huggingface-hub>=0.35.1",
+    "kagglehub[pandas-datasets]>=0.3.13",
     "loguru>=0.7.3",
     "openai>=1.109.0",
     "pandas>=2.3.2",
@@ -33,6 +34,10 @@ select = ["E", "F", "UP", "B", "SIM", "I"]
 python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = "kagglehub.*"
+ignore_missing_imports = true
 
 [dependency-groups]
 dev = [
