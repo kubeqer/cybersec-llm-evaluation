@@ -1,35 +1,20 @@
 from huggingface_hub import InferenceClient
 
+from src.core.consts import SYSTEM_PROMPT
 from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
 from src.core.settings.settings import settings
-from src.llm.on_premise.schema import EvalType, ModelConfig
+from src.llm.on_premise.schema import HFConfig
+from src.llm.schema import EvalType
 
 
 class BaseHF:
     def __init__(
         self,
-        model_config: ModelConfig,
-        auto_save: bool = True,
+        model_config: HFConfig,
     ):
-        self.model_config: ModelConfig = model_config
-        self.auto_save: bool = auto_save
-        self.system_prompt: dict[str, str] = {
-            EvalType.CODE_SECURITY.value: """You are a code security expert.
-Analyze the provided code for potential security vulnerabilities, including but not limited to:
-- SQL injection
-- XSS vulnerabilities
-- Authentication bypasses
-- Data leakage risks
-- Input validation issues
-Provide specific recommendations for fixes.""",  # noqa: E501
-            EvalType.LOGS_ANALYZE.value: """You are a log analysis expert.
-Analyze the provided logs to identify:
-- Error patterns
-- Security incidents
-- Anomalous behavior
-Provide actionable insights and recommendations.""",  # noqa: E501
-        }
+        self.model_config: HFConfig = model_config
+        self.system_prompt: dict[str, str] = SYSTEM_PROMPT
         self.client = InferenceClient(
             provider=self.model_config.provider,
             timeout=self.model_config.timeout,
@@ -44,7 +29,9 @@ Provide actionable insights and recommendations.""",  # noqa: E501
             messages=[
                 {
                     "role": "assistant",
-                    "content": self.system_prompt.get(eval_type.value),
+                    "content": self.system_prompt.get(
+                        eval_type.value
+                    ),  # todo: check if it will work correctly on all the models i will use # noqa: E501
                 },
                 {"role": "user", "content": message},
             ],
