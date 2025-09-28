@@ -1,10 +1,10 @@
 import anthropic
 
-from src.core.consts import SYSTEM_PROMPT
 from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
 from src.core.settings.settings import settings
 from src.llm.cloud.anthropic.schema import AnthropicConfig
+from src.llm.consts import SYSTEM_PROMPT
 from src.llm.schema import EvalType
 
 
