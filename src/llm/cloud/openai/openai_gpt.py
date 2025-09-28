@@ -1,8 +1,8 @@
 from openai import OpenAI
 
-from src.core.consts import SYSTEM_PROMPT
 from src.core.settings.settings import settings
 from src.llm.cloud.openai.schema import OpenAIConfig
+from src.llm.consts import SYSTEM_PROMPT
 from src.llm.schema import EvalType
 
 

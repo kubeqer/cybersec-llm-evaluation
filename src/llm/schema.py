@@ -25,3 +25,13 @@ class ModelConfig:
 class EvalType(Enum):
     CODE_SECURITY = "code_security"
     LOGS_ANALYZE = "logs_analyze"
+    PHISHING_DETECTION = "phishing_detection"
+    MALWARE_ANALYSIS = "malware_analysis"
+    INTRUSION_DETECTION = "intrusion_detection"
+    INCIDENT_RESPONSE = "incident_response"
+    THREAT_INTELLIGENCE = "threat_intelligence"
+    VULNERABILITY_ASSESSMENT = "vulnerability_assessment"
+    SQL_INJECTION = "sql_injection"
+    XSS_DETECTION = "xss_detection"
+    DDoS_DETECTION = "ddos_detection"
+    RANSOMWARE_DETECTION = "ransomware_detection"

@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
     hf_token: str = Field(alias="HF_TOKEN")
     anthropic_token: str = Field(alias="ANTHROPIC_TOKEN")
-    google_apikey: str = Field(alias="GOOGLE_APIKEY")
-    openai_apikey: str = Field(alias="OPENAI_APIKEY")
+    google_apikey: str = Field(alias="GOOGLE_API_KEY")
+    openai_apikey: str = Field(alias="OPENAI_API_KEY")
 
 
 settings = Settings()  # type: ignore
