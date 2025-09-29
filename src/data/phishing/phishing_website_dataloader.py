@@ -5,6 +5,8 @@ import requests
 from loguru import logger
 from requests import HTTPError, RequestException, Timeout
 
+from src.core.decorators.error_handling import error_handling
+from src.core.decorators.log_calls import log_calls
 from src.core.paths import DATA_DIR
 from src.data.schema import InputAnswerDict
 
@@ -126,12 +128,16 @@ class PhishingWebsiteDataLoader:
         "url_shortened",
     ]
 
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def load(self):
         if not self.FILE_PATH.exists():
             self._download_dataset_small()
         df = pd.read_csv(self.FILE_PATH)
         return self._preprocess(df)
 
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def _preprocess(self, df: pd.DataFrame) -> list[InputAnswerDict]:
         if not all(col in df.columns for col in self.FEATURE_COLUMNS):
             missing = [col for col in self.FEATURE_COLUMNS if col not in df.columns]
@@ -159,8 +165,9 @@ class PhishingWebsiteDataLoader:
             for row in df[["Input", "phishing"]].itertuples(index=False)
         ]
 
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def _download_dataset_small(self) -> None:
-        logger.info(f"Starting download of phishing dataset from {self.URL}")
         try:
             response = requests.get(self.URL, timeout=60)
             response.raise_for_status()

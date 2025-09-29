@@ -209,3 +209,5 @@ __marimo__/
 logs/
 results/
 .env.local
+.deepeval/
+data/
