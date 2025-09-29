@@ -1,6 +1,8 @@
 from google import genai
 from google.genai import types
 
+from src.core.decorators.error_handling import error_handling
+from src.core.decorators.log_calls import log_calls
 from src.core.settings.settings import settings
 from src.llm.cloud.google.schema import GoogleConfig
 from src.llm.consts import SYSTEM_PROMPT
@@ -16,6 +18,8 @@ class GoogleGemini:
         self.system_prompt: dict[str, str] = SYSTEM_PROMPT
         self.client = genai.Client(api_key=settings.google_apikey)
 
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def generate(self, message: str, eval_type: EvalType) -> str:
         completion = self.client.models.generate_content(
             model=self.model_config.model_name,

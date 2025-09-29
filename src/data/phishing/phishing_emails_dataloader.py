@@ -1,5 +1,7 @@
 import pandas as pd
 
+from src.core.decorators.error_handling import error_handling
+from src.core.decorators.log_calls import log_calls
 from src.data.base import BaseDataLoader
 from src.data.schema import InputAnswerDict
 
@@ -20,6 +22,8 @@ class PhishingEmailsDataLoader(BaseDataLoader):
     def __init__(self):
         super().__init__(dataset_slug=self.DATASET_SLUG, file_path=self.FILE_PATH)
 
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def _preprocess(self, df: pd.DataFrame) -> list[InputAnswerDict]:
         df["Input"] = df.apply(lambda row: self.INPUT_TEMPLATE.format(**row), axis=1)
         df["Answer"] = df.apply(lambda row: self.ANSWER_TEMPLATE.format(**row), axis=1)
@@ -27,6 +31,3 @@ class PhishingEmailsDataLoader(BaseDataLoader):
             InputAnswerDict(input=str(row.Input), answer=str(row.Answer))
             for row in df[["Input", "Answer"]].itertuples(index=False)
         ]
-
-
-print(PhishingEmailsDataLoader().load())

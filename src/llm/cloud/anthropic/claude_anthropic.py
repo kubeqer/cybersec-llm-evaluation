@@ -17,8 +17,8 @@ class ClaudeAnthropic:
         self.system_prompt: dict[str, str] = SYSTEM_PROMPT
         self.client = anthropic.Anthropic(auth_token=settings.anthropic_token)
 
-    @error_handling
-    @log_calls
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def generate(self, message: str, eval_type: EvalType) -> str:
         # noinspection PyTypeChecker
         completion = self.client.messages.create(

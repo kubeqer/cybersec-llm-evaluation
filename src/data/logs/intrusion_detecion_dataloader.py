@@ -3,6 +3,8 @@ from typing import cast
 import pandas as pd
 from loguru import logger
 
+from src.core.decorators.error_handling import error_handling
+from src.core.decorators.log_calls import log_calls
 from src.data.base import BaseDataLoader
 from src.data.schema import InputAnswerDict
 
@@ -36,6 +38,8 @@ class IntrusionDetectionDataLoader(BaseDataLoader):
     def __init__(self):
         super().__init__(dataset_slug=self.DATASET_SLUG, file_path=self.FILE_PATH)
 
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def _preprocess(self, df: pd.DataFrame) -> list[InputAnswerDict]:
         if not all(col in df.columns for col in self.FEATURE_COLUMNS):
             missing = [col for col in self.FEATURE_COLUMNS if col not in df.columns]

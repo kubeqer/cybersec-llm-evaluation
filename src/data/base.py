@@ -4,6 +4,8 @@ import kagglehub
 import pandas as pd
 from loguru import logger
 
+from src.core.decorators.error_handling import error_handling
+from src.core.decorators.log_calls import log_calls
 from src.data.schema import InputAnswerDict
 
 
@@ -12,6 +14,8 @@ class BaseDataLoader(ABC):
         self.dataset_slug = dataset_slug
         self.file_path = file_path
 
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def load(
         self,
         pandas_kwargs=None,

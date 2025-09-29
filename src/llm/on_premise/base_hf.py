@@ -21,8 +21,8 @@ class BaseHF:
             token=settings.hf_token,
         )
 
-    @error_handling
-    @log_calls
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
     def generate(self, message: str, eval_type: EvalType) -> str:
         completion = self.client.chat.completions.create(
             model=self.model_config.model_name,
