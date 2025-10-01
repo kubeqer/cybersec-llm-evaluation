@@ -1,30 +1,35 @@
 import pandas as pd
+from datasets import load_dataset  # type: ignore[import-untyped]
 
 from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
-from src.data.base import BaseDataLoader
 from src.data.schema import InputAnswerDict
 
 
-class PhishingEmailsDataLoader(BaseDataLoader):
-    DATASET_SLUG = "kuladeep19/phishing-and-legitimate-emails-dataset"
-    FILE_PATH = "phishing_legit_dataset_KD_10000.csv"
+class BigVulDataLoader:
+    # can add identifying by cve
+    DATASET_SLUG = "bstee615/bigvul"
+    SPLIT = "test"
     FEATURE_COLUMNS = [
-        "text",
-        "label",  # 1 = phishing email, 0 = legitimate email.
-        "phishing_type",
-        "severity",
-        "confidence",
+        "func_before",
+        "func_after",
+        "vul",
+        "commit_message",
     ]
-    INPUT_TEMPLATE = "Text: {text} "
-    ANSWER_TEMPLATE = "Is phishing: {label}, Phishing Type: {phishing_type}, "
+    INPUT_TEMPLATE = "Commit before:\n{func_before}\nCommit after:\n{func_after}\n"
+    ANSWER_TEMPLATE = "Vulnerable: {target}"
 
-    def __init__(self):
-        super().__init__(dataset_slug=self.DATASET_SLUG, file_path=self.FILE_PATH)
+    @log_calls(level="INFO")
+    @error_handling(default=[], reraise=True)
+    def load(self):
+        dataset = load_dataset(self.DATASET_SLUG, split=self.SPLIT)
+        df = pd.DataFrame(dataset)
+        return self._preprocess(df)
 
     @log_calls(level="INFO")
     @error_handling(default=[], reraise=True)
     def _preprocess(self, df: pd.DataFrame) -> list[InputAnswerDict]:
+        df = df.fillna("")
         df["Input"] = df.apply(lambda row: self.INPUT_TEMPLATE.format(**row), axis=1)
         df["Answer"] = df.apply(lambda row: self.ANSWER_TEMPLATE.format(**row), axis=1)
         return [
