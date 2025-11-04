@@ -11,3 +11,4 @@ class AnthropicConfig(ModelConfig):
         "claude-opus-4-1",
         "claude-sonnet-4-0",
     ]
+    max_tokens: int = 1

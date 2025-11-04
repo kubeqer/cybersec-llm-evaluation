@@ -20,5 +20,6 @@ class OpenAIGPT:
             model=self.model_config.model_name,
             instructions=SYSTEM_PROMPT.get(eval_type.value),
             input=message,
+            max_output_tokens=self.model_config.max_tokens,
         )
         return completion.output_text

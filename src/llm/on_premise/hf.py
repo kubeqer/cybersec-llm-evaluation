@@ -8,7 +8,7 @@ from src.llm.on_premise.schema import HFConfig
 from src.llm.schema import EvalType
 
 
-class BaseHF:
+class HF:
     def __init__(
         self,
         model_config: HFConfig,
