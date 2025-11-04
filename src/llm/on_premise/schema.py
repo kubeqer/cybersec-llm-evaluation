@@ -28,3 +28,4 @@ class HFConfig(ModelConfig):
         "together",
         "auto",
     ] = "auto"
+    max_tokens: int = 1

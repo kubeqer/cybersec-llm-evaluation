@@ -1,15 +1,10 @@
 from typing import Any
-
-from deepeval import evaluate
-from deepeval.metrics import DAGMetric
-from deepeval.metrics.dag import BinaryJudgementNode, VerdictNode, DeepAcyclicGraph
-from deepeval.test_case import LLMTestCase, LLMTestCaseParams
 from loguru import logger
 
 from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
 from src.data.schema import InputAnswerDict
-from src.evaluation.schema import EvalResult
+from src.evaluation.schema import EvalResult, ConfusionMatrix
 from src.llm.schema import EvalType
 
 
@@ -18,100 +13,138 @@ class LLMEvaluator:
             self,
             llm_model: Any,
             eval_type: EvalType,
-            threshold: float = 0.5,
     ):
         self.llm_model = llm_model
         self.eval_type = eval_type
-        self.threshold = threshold
-        logger.info(
-            f"Initialized LLMEvaluator with eval_type={eval_type.value}, "
-            f"threshold={threshold}"
-        )
+        logger.info(f"Initialized LLMEvaluator with eval_type={eval_type.value}")
 
     @log_calls(level="INFO", show_result=True)
     @error_handling(default=None, reraise=True)
     def evaluate(
             self, data: list[InputAnswerDict], max_samples: int | None = None
-    ) -> EvalResult:
+    ) -> EvalResult | None:
+        """Main evaluation method"""
         if not data:
             logger.warning("Empty data provided for evaluation")
-            return EvalResult(
-                model_name=self._get_model_name(),
-                total=0,
-                correct=0,
-                incorrect=0,
-                avg_comprehensiveness=0.0,
-            )
-        eval_data = data[:max_samples] if max_samples else data
-        logger.info(f"Evaluating {len(eval_data)} samples")
-        test_cases = self._create_test_cases(eval_data)
-        root_node = BinaryJudgementNode(
-            criteria="Does the actual output match the expected output? Consider semantic equivalence (e.g., 'yes' = 'true', '1' = 'positive', 'no' = 'false', '0' = 'negative').",
-            children=[
-                VerdictNode(verdict=True, score=1),
-                VerdictNode(verdict=False, score=0)
-            ],
-            evaluation_params=[
-                LLMTestCaseParams.ACTUAL_OUTPUT,
-                LLMTestCaseParams.EXPECTED_OUTPUT
-            ],
-            label="Check Binary Match"
-        )
-        dag = DeepAcyclicGraph(root_nodes=[root_node]) # type: ignore[arg-type]
-        metric = DAGMetric(
-            name="Binary Accuracy",
-            dag=dag,
-            threshold=self.threshold
-        )
-        logger.info("Running DeepEval evaluation.")
-        results = evaluate(test_cases=test_cases, metrics=[metric]) # type: ignore[arg-type]
-        return self._aggregate_results(results, len(eval_data))
+            return None
 
-    def _create_test_cases(self, data: list[InputAnswerDict]) -> list[LLMTestCase]:
-        test_cases = []
-        for idx, item in enumerate(data):
-            input_text: str = item["input"]
-            expected_answer: int | str = item["answer"]
-            actual_output = self.llm_model.generate(
-                message=input_text, eval_type=self.eval_type
-            )
-            test_case = LLMTestCase(
-                input=input_text,
-                actual_output=actual_output,
-                expected_output=str(expected_answer),
-            )
-            test_cases.append(test_case)
-            if (idx + 1) % 10 == 0:
-                logger.info(f"Created {idx + 1}/{len(data)} test cases")
-        return test_cases
-
-    def _aggregate_results(
-            self, results: Any, total_samples: int
-    ) -> EvalResult:
-        correct = 0
-        total_score = 0.0
-        for test_result in results.test_results:
-            for metric_data in test_result.metrics_data:
-                if metric_data.score == 1.0:
-                    correct += 1
-                total_score += metric_data.score
-        incorrect = total_samples - correct
-        accuracy_percentage = (correct / total_samples * 100) if total_samples > 0 else 0.0
-
-        eval_result = EvalResult(
-            model_name=self._get_model_name(),
-            total=total_samples,
-            correct=correct,
-            incorrect=incorrect,
-            avg_comprehensiveness=accuracy_percentage,
-        )
+        eval_data = self._prepare_data(data, max_samples)
+        confusion_matrix = self._evaluate_samples(eval_data)
+        eval_result = self._build_result(eval_data, confusion_matrix)
 
         logger.info(
-            f"Evaluation complete: {correct}/{total_samples} correct "
-            f"({accuracy_percentage:.2f}%)"
+            f"Evaluation complete: {eval_result.correct}/{eval_result.total} correct ({eval_result.avg_comprehensiveness:.2f}%)\n"
+            f"  TP={eval_result.true_positives}, FP={eval_result.false_positives}, "
+            f"TN={eval_result.true_negatives}, FN={eval_result.false_negatives}\n"
+            f"  Precision={eval_result.precision:.2f}%, Recall={eval_result.recall:.2f}%, F1={eval_result.f1_score:.2f}%"
         )
 
         return eval_result
+
+    @staticmethod
+    def _prepare_data(
+            data: list[InputAnswerDict], max_samples: int | None
+    ) -> list[InputAnswerDict]:
+        eval_data = data[:max_samples] if max_samples else data
+        logger.info(f"Evaluating {len(eval_data)} samples")
+        return eval_data
+
+    def _evaluate_samples(self, eval_data: list[InputAnswerDict]) -> ConfusionMatrix:
+        confusion_matrix = ConfusionMatrix()
+        for idx, item in enumerate(eval_data):
+            predicted, actual = self._evaluate_single_sample(item, idx)
+            if predicted == -1:
+                confusion_matrix.false_negatives += 1
+            else:
+                confusion_matrix.update(predicted, actual)
+            if (idx + 1) % 10 == 0:
+                logger.info(f"Evaluated {idx + 1}/{len(eval_data)} samples")
+
+        return confusion_matrix
+
+    def _evaluate_single_sample(
+            self, item: InputAnswerDict, idx: int
+    ) -> tuple[int, int]:
+        input_text: str = item["input"]
+        expected_answer: int | str = item["answer"]
+        actual_output = self.llm_model.generate(
+            message=input_text, eval_type=self.eval_type
+        )
+        predicted = self._normalize_output(actual_output)
+        actual = self._normalize_output(expected_answer)
+        if predicted == -1:
+            logger.warning(f"Invalid prediction at sample {idx + 1}: {actual_output}")
+        return predicted, actual
+
+    def _build_result(
+            self, eval_data: list[InputAnswerDict], confusion_matrix: ConfusionMatrix
+    ) -> EvalResult:
+        total = len(eval_data)
+        accuracy = self._calculate_accuracy(confusion_matrix)
+        precision = self._calculate_precision(confusion_matrix)
+        recall = self._calculate_recall(confusion_matrix)
+        f1_score = self._calculate_f1_score(precision, recall)
+        return EvalResult(
+            model_name=self._get_model_name(),
+            total=total,
+            correct=confusion_matrix.correct,
+            incorrect=confusion_matrix.incorrect,
+            avg_comprehensiveness=accuracy,
+            true_positives=confusion_matrix.true_positives,
+            false_positives=confusion_matrix.false_positives,
+            true_negatives=confusion_matrix.true_negatives,
+            false_negatives=confusion_matrix.false_negatives,
+            precision=precision * 100,
+            recall=recall * 100,
+            f1_score=f1_score * 100,
+        )
+
+    @staticmethod
+    def _calculate_accuracy(confusion_matrix: ConfusionMatrix) -> float:
+        denominator = confusion_matrix.correct + confusion_matrix.incorrect
+        if denominator == 0:
+            return 0.0
+        return confusion_matrix.correct / denominator
+
+    @staticmethod
+    def _calculate_precision(confusion_matrix: ConfusionMatrix) -> float:
+        denominator = confusion_matrix.true_positives + confusion_matrix.false_positives
+        if denominator == 0:
+            return 0.0
+        return confusion_matrix.true_positives / denominator
+
+    @staticmethod
+    def _calculate_recall(confusion_matrix: ConfusionMatrix) -> float:
+        denominator = confusion_matrix.true_positives + confusion_matrix.false_negatives
+        if denominator == 0:
+            return 0.0
+        return confusion_matrix.true_positives / denominator
+
+    @staticmethod
+    def _calculate_f1_score(precision: float, recall: float) -> float:
+        denominator = precision + recall
+        if denominator == 0:
+            return 0.0
+        return 2 * precision * recall / denominator
+
+    @staticmethod
+    def _normalize_output(output: int | str) -> int:
+        try:
+            output_clean = str(output).strip().lower()
+            if len(output_clean) > 1:
+                output_clean = output_clean[0]
+
+            value = int(output_clean)
+
+            if value in (0, 1):
+                return value
+            else:
+                logger.warning(f"Output not 0 or 1: {output}")
+                return -1
+        except (ValueError, TypeError):
+            logger.warning(f"Cannot parse output: {output}")
+            return -1
+
 
     def _get_model_name(self) -> str:
         try:

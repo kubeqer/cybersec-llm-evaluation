@@ -8,3 +8,4 @@ from src.llm.schema import ModelConfig
 @dataclass(kw_only=True)
 class OpenAIConfig(ModelConfig):
     model_name: Literal["gpt-5-nano", "gpt-5-mini", "gpt-5", "gpt-5-codex"]
+    max_tokens: int = 1

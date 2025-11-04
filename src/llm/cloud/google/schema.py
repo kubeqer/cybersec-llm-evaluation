@@ -8,3 +8,4 @@ from src.llm.schema import ModelConfig
 @dataclass(kw_only=True)
 class GoogleConfig(ModelConfig):
     model_name: Literal["gemini-2.5-pro", "gemini-2.5-flash"]
+    max_tokens: int = 1

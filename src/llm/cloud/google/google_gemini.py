@@ -26,6 +26,7 @@ class GoogleGemini:
             contents=message,
             config=types.GenerateContentConfig(
                 system_instruction=self.system_prompt.get(eval_type.value),
+                max_output_tokens=self.model_config.max_tokens,
             ),
         )
         return completion.text if completion.text else ""
