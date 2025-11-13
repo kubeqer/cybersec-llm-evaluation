@@ -1,7 +1,7 @@
 import anthropic
 
-from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
+from src.core.decorators.retry import retry
 from src.core.settings.settings import settings
 from src.llm.cloud.anthropic.schema import AnthropicConfig
 from src.llm.consts import SYSTEM_PROMPT
@@ -18,7 +18,7 @@ class ClaudeAnthropic:
         self.client = anthropic.Anthropic(auth_token=settings.anthropic_token)
 
     @log_calls(level="INFO")
-    @error_handling(default=[], reraise=True)
+    @retry(max_retries=3, delay_seconds=300)
     def generate(self, message: str, eval_type: EvalType) -> str:
         # noinspection PyTypeChecker
         completion = self.client.messages.create(

@@ -1,7 +1,7 @@
 from huggingface_hub import InferenceClient
 
-from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
+from src.core.decorators.retry import retry
 from src.core.settings.settings import settings
 from src.llm.consts import SYSTEM_PROMPT
 from src.llm.on_premise.schema import HFConfig
@@ -22,7 +22,7 @@ class HF:
         )
 
     @log_calls(level="INFO")
-    @error_handling(default=[], reraise=True)
+    @retry(max_retries=3, delay_seconds=300)
     def generate(self, message: str, eval_type: EvalType) -> str:
         completion = self.client.chat.completions.create(
             model=self.model_config.model_name,

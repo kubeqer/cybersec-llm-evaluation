@@ -1,5 +1,6 @@
 from openai import OpenAI
 
+from src.core.decorators.retry import retry
 from src.core.settings.settings import settings
 from src.llm.cloud.openai.schema import OpenAIConfig
 from src.llm.consts import SYSTEM_PROMPT
@@ -15,6 +16,7 @@ class OpenAIGPT:
         self.system_prompt: dict[str, str] = SYSTEM_PROMPT
         self.client = OpenAI(api_key=settings.openai_apikey)
 
+    @retry(max_retries=3, delay_seconds=300)
     def generate(self, message: str, eval_type: EvalType) -> str:
         completion = self.client.responses.create(
             model=self.model_config.model_name,
