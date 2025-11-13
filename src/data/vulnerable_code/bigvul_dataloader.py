@@ -17,7 +17,7 @@ class BigVulDataLoader:
         "commit_message",
     ]
     INPUT_TEMPLATE = "Commit before:\n{func_before}\nCommit after:\n{func_after}\n"
-    ANSWER_TEMPLATE = "Vulnerable: {target}"
+    ANSWER_TEMPLATE = "Vulnerable: {vul}"
 
     @log_calls(level="INFO")
     @error_handling(default=[], reraise=True)

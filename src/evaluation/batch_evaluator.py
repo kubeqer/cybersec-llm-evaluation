@@ -1,6 +1,4 @@
-import multiprocessing as mp
-import pickle
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from loguru import logger
 
@@ -9,7 +7,7 @@ from src.evaluation.schema import EvalResult
 from src.llm.schema import EvalType
 
 
-class MultiProcessBatchEvaluator:
+class BatchEvaluator:
     def __init__(self, llm_models: list[object], eval_type: EvalType):
         self.llm_models = llm_models
         self.eval_type = eval_type
@@ -19,7 +17,7 @@ class MultiProcessBatchEvaluator:
 
     @staticmethod
     def _evaluate_single_model(
-        model_pickle: bytes,
+        model,
         data: list[InputAnswerDict],
         eval_type: EvalType,
         max_samples: int | None,
@@ -27,15 +25,18 @@ class MultiProcessBatchEvaluator:
         try:
             from src.evaluation.evaluator import LLMEvaluator
 
-            model = pickle.loads(model_pickle)
             evaluator = LLMEvaluator(llm_model=model, eval_type=eval_type)
-            logger.info(f"Process {mp.current_process().name}: Starting evaluation")
+            logger.info(
+                f"Starting evaluation for model: {model.model_config.model_name}"
+            )
             result: EvalResult = evaluator.evaluate(data=data, max_samples=max_samples)
-            logger.info(f"Process {mp.current_process().name}: Completed evaluation")
+            logger.info(
+                f"Completed evaluation for model: {model.model_config.model_name}"
+            )
             return result
         except Exception as e:
             logger.error(
-                f"Process {mp.current_process().name}: Evaluation failed - {e}"
+                f"Evaluation failed for model: {model.model_config.model_name} - {e}"
             )
             raise
 
@@ -46,34 +47,27 @@ class MultiProcessBatchEvaluator:
         max_workers: int | None = None,
     ) -> list[EvalResult]:
         if max_workers is None:
-            max_workers = min(len(self.llm_models), mp.cpu_count())
-        logger.info(f"Starting evaluation with {max_workers} parallel processes")
+            max_workers = len(self.llm_models)
+        logger.info(f"Starting evaluation with {max_workers} parallel threads")
         results = []
-        pickled_models = []
-        for idx, model in enumerate(self.llm_models):
-            try:
-                pickled_model = pickle.dumps(model)
-                pickled_models.append(pickled_model)
-                logger.info(f"Serialized model {idx + 1}/{len(self.llm_models)}")
-            except Exception as e:
-                logger.error(f"Failed to serialize model {idx + 1}: {e}")
-                raise
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {}
-            for idx, pickled_model in enumerate(pickled_models):
+            for idx, model in enumerate(self.llm_models):
                 future = executor.submit(
                     self._evaluate_single_model,
-                    pickled_model,
+                    model,
                     data,
                     self.eval_type,
                     max_samples,
                 )
-                futures[future] = idx
+                futures[future] = (idx, model)
                 logger.info(
                     f"Submitted model {idx + 1}/{len(self.llm_models)} for evaluation"
                 )
+
             for future in as_completed(futures):
-                idx = futures[future]
+                idx, model = futures[future]
 
                 try:
                     result = future.result()
@@ -85,6 +79,7 @@ class MultiProcessBatchEvaluator:
                     )
                 except Exception as e:
                     logger.error(f"Model {idx + 1}/{len(self.llm_models)} failed: {e}")
+
         logger.info(
             f"Completed {len(results)}/{len(self.llm_models)} model evaluations"
         )

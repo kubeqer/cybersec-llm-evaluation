@@ -1,3 +1,4 @@
+import re
 from typing import Any
 from loguru import logger
 
@@ -129,20 +130,44 @@ class LLMEvaluator:
 
     @staticmethod
     def _normalize_output(output: int | str) -> int:
+        """
+        Output normalization that handles various response formats.
+
+        Patterns handled:
+        - "0" or "1" (direct)
+        - "Vulnerable: 0" or "Vulnerable: 1"
+        - "Is phishing: 1"
+        - "0\nExplanation..." (multi-line)
+        - "The answer is 0"
+        - And more...
+        """
         try:
-            output_clean = str(output).strip().lower()
-            if len(output_clean) > 1:
-                output_clean = output_clean[0]
-
-            value = int(output_clean)
-
-            if value in (0, 1):
-                return value
-            else:
-                logger.warning(f"Output not 0 or 1: {output}")
+            output_str = str(output).strip()
+            if not output_str:
+                logger.warning(f"Empty output")
                 return -1
-        except (ValueError, TypeError):
-            logger.warning(f"Cannot parse output: {output}")
+            if output_str[0] in ('0', '1'):
+                return int(output_str[0])
+            colon_match = re.search(r':\s*([01])', output_str)
+            if colon_match:
+                return int(colon_match.group(1))
+            digits = re.findall(r'\b([01])\b', output_str)
+            if digits:
+                return int(digits[0])
+            output_lower = output_str.lower()
+            if 'zero' in output_lower or 'not vulnerable' in output_lower or 'not phishing' in output_lower or 'safe' in output_lower or 'legitimate' in output_lower:
+                return 0
+            if 'one' in output_lower or 'vulnerable' in output_lower or 'phishing' in output_lower or 'malicious' in output_lower:
+                return 1
+            numbers = re.findall(r'\d+', output_str)
+            for num in numbers:
+                val = int(num)
+                if val in (0, 1):
+                    return val
+            logger.warning(f"Cannot parse output: {output_str[:100]}")
+            return -1
+        except (ValueError, TypeError, IndexError) as e:
+            logger.warning(f"Error parsing output: {output} - {e}")
             return -1
 
 
