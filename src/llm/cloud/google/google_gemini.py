@@ -2,8 +2,8 @@ from google import genai
 from google.genai import types
 from loguru import logger
 
-from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
+from src.core.decorators.retry import retry
 from src.core.settings.settings import settings
 from src.llm.cloud.google.schema import GoogleConfig
 from src.llm.consts import SYSTEM_PROMPT
@@ -20,19 +20,14 @@ class GoogleGemini:
         self.client = genai.Client(api_key=settings.google_apikey)
 
     @log_calls(level="INFO")
-    @error_handling(default=[], reraise=True)
+    @retry(max_retries=3, delay_seconds=300)
     def generate(self, message: str, eval_type: EvalType) -> str | None:
-        try:
-            completion = self.client.models.generate_content(
-                model=self.model_config.model_name,
-                contents=message,
-                config=types.GenerateContentConfig(
-                    system_instruction=self.system_prompt.get(eval_type.value),
-                ),
-            )
-            logger.info(completion.text)
-
-        except Exception as e:
-            logger.error(f"Failed to generate response: {e}")
-            return None
+        completion = self.client.models.generate_content(
+            model=self.model_config.model_name,
+            contents=message,
+            config=types.GenerateContentConfig(
+                system_instruction=self.system_prompt.get(eval_type.value),
+            ),
+        )
+        logger.info(completion.text)
         return completion.text
