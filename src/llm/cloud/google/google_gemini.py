@@ -1,5 +1,6 @@
 from google import genai
 from google.genai import types
+from loguru import logger
 
 from src.core.decorators.error_handling import error_handling
 from src.core.decorators.log_calls import log_calls
@@ -20,13 +21,18 @@ class GoogleGemini:
 
     @log_calls(level="INFO")
     @error_handling(default=[], reraise=True)
-    def generate(self, message: str, eval_type: EvalType) -> str:
-        completion = self.client.models.generate_content(
-            model=self.model_config.model_name,
-            contents=message,
-            config=types.GenerateContentConfig(
-                system_instruction=self.system_prompt.get(eval_type.value),
-                max_output_tokens=self.model_config.max_tokens,
-            ),
-        )
-        return completion.text if completion.text else ""
+    def generate(self, message: str, eval_type: EvalType) -> str | None:
+        try:
+            completion = self.client.models.generate_content(
+                model=self.model_config.model_name,
+                contents=message,
+                config=types.GenerateContentConfig(
+                    system_instruction=self.system_prompt.get(eval_type.value),
+                ),
+            )
+            logger.info(completion.text)
+
+        except Exception as e:
+            logger.error(f"Failed to generate response: {e}")
+            return None
+        return completion.text
