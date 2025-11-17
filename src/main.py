@@ -304,7 +304,7 @@ def initialize_all_models():
         models.append(
             ClaudeAnthropic(
                 model_config=AnthropicConfig(
-                    model_name="claude-sonnet-4-0",
+                    model_name="claude-sonnet-4-5",
                     max_tokens=2048,
                     temperature=0.0,
                 )
@@ -360,6 +360,53 @@ def initialize_all_models():
 
     # OpenAI GPT models
     logger.info("\n--- OpenAI GPT Models ---")
+
+    # GPT-5 Pro
+    try:
+        models.append(
+            OpenAIGPT(
+                model_config=OpenAIConfig(
+                    model_name="gpt-5-pro",
+                    max_tokens=2048,
+                    temperature=0.0,
+                )
+            )
+        )
+        logger.info("✓ Initialized GPT-5 Pro")
+    except Exception as e:
+        logger.warning(f"✗ Failed to initialize GPT-5 Pro: {e}")
+
+    # GPT-5.1
+    try:
+        models.append(
+            OpenAIGPT(
+                model_config=OpenAIConfig(
+                    model_name="gpt-5.1",
+                    max_tokens=2048,
+                    temperature=0.0,
+                )
+            )
+        )
+        logger.info("✓ Initialized GPT-5.1")
+    except Exception as e:
+        logger.warning(f"✗ Failed to initialize GPT-5.1: {e}")
+
+    # GPT-5.1 Codex
+    try:
+        models.append(
+            OpenAIGPT(
+                model_config=OpenAIConfig(
+                    model_name="gpt-5.1-codex",
+                    max_tokens=2048,
+                    temperature=0.0,
+                )
+            )
+        )
+        logger.info("✓ Initialized GPT-5.1 Codex")
+    except Exception as e:
+        logger.warning(f"✗ Failed to initialize GPT-5.1 Codex: {e}")
+
+    # GPT-5
     try:
         models.append(
             OpenAIGPT(
@@ -374,51 +421,51 @@ def initialize_all_models():
     except Exception as e:
         logger.warning(f"✗ Failed to initialize GPT-5: {e}")
 
+    # GPT-5 Nano
     try:
         models.append(
             OpenAIGPT(
                 model_config=OpenAIConfig(
-                    model_name="gpt-5-mini",
+                    model_name="gpt-5-nano",
                     max_tokens=2048,
                     temperature=0.0,
                 )
             )
         )
-        logger.info("✓ Initialized GPT-5 Mini")
+        logger.info("✓ Initialized GPT-5 Nano")
     except Exception as e:
-        logger.warning(f"✗ Failed to initialize GPT-5 Mini: {e}")
-
+        logger.warning(f"✗ Failed to initialize GPT-5 Nano: {e}")
     # Hugging Face models (examples with popular cybersecurity-relevant models)
     logger.info("\n--- Hugging Face Models ---")
-    try:
-        models.append(
-            HF(
-                model_config=HFConfig(
-                    model_name="meta-llama/Llama-3.3-70B-Instruct",
-                    provider="auto",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Llama 3.3 70B Instruct")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Llama 3.3 70B: {e}")
-
-    try:
-        models.append(
-            HF(
-                model_config=HFConfig(
-                    model_name="Qwen/Qwen2.5-72B-Instruct",
-                    provider="auto",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Qwen 2.5 72B Instruct")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Qwen 2.5 72B: {e}")
+    # try:
+    #     models.append(
+    #         HF(
+    #             model_config=HFConfig(
+    #                 model_name="meta-llama/Llama-3.3-70B-Instruct",
+    #                 provider="auto",
+    #                 max_tokens=2048,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized Llama 3.3 70B Instruct")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize Llama 3.3 70B: {e}")
+    #
+    # try:
+    #     models.append(
+    #         HF(
+    #             model_config=HFConfig(
+    #                 model_name="Qwen/Qwen2.5-72B-Instruct",
+    #                 provider="auto",
+    #                 max_tokens=2048,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized Qwen 2.5 72B Instruct")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize Qwen 2.5 72B: {e}")
 
     logger.info(f"\n{'=' * 80}")
     logger.info(f"Total models initialized: {len(models)}")
@@ -487,7 +534,7 @@ def load_all_datasets():
         data = loader.load()
         datasets["cyberbench"] = {
             "data": data,
-            "eval_type": EvalType.THREAT_INTELLIGENCE,  # Using a general cybersecurity eval type
+            "eval_type": EvalType.CYBERSECURITY_MCQ,
             "name": "CyberBench Q&A",
         }
         logger.info(f"✓ Loaded {len(data)} CyberBench Q&A samples")
@@ -502,7 +549,7 @@ def load_all_datasets():
         data = loader.load()
         datasets["secbench"] = {
             "data": data,
-            "eval_type": EvalType.VULNERABILITY_ASSESSMENT,  # Using a general cybersecurity eval type
+            "eval_type": EvalType.CYBERSECURITY_MCQ,  # Using a general cybersecurity eval type
             "name": "SecBench Q&A",
         }
         logger.info(f"✓ Loaded {len(data)} SecBench Q&A samples")
@@ -568,7 +615,7 @@ def main_comprehensive():
         results = run_evaluations(
             models=models,
             datasets=datasets,
-            max_samples=1000,  # Limit to 1000 samples per dataset (set to None for all data)
+            max_samples=20,  # Limit to 1000 samples per dataset (set to None for all data)
             max_workers=None,  # Use all available CPU cores
         )
 
@@ -619,7 +666,7 @@ def main():
         results = run_evaluations(
             models=models,
             datasets=datasets,
-            max_samples=1000,  # Limit to 100 samples per dataset for faster testing
+            max_samples=20,  # Limit to 100 samples per dataset for faster testing
             max_workers=None,  # Use all available CPU cores
         )
 
@@ -640,7 +687,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     # Use main_comprehensive() to test ALL datasets with ALL models
     # Use main() for the original limited testing
-    # main_comprehensive()
+    main_comprehensive()

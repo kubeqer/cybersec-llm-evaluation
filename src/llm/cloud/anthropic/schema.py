@@ -9,6 +9,6 @@ from src.llm.schema import ModelConfig
 class AnthropicConfig(ModelConfig):
     model_name: Literal[
         "claude-opus-4-1",
-        "claude-sonnet-4-0",
+        "claude-sonnet-4-5",
     ]
     max_tokens: int = 1

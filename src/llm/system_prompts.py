@@ -180,33 +180,29 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if incident response IS required (immediate action needed)
 - Return 0 if NO response is needed (routine monitoring sufficient)""",
 
-    EvalType.THREAT_INTELLIGENCE.value: """You are a threat intelligence expert specializing in identifying and analyzing cybersecurity threats.
-Analyze the provided indicators using this intelligence framework:
-**STEP 1: Indicator Collection**
-- What indicators are present (IPs, domains, hashes, URLs, patterns)?
-- What is the source and context of these indicators?
-- What is the timeframe and relevance?
-**STEP 2: Threat Attribution**
-- Known Threats: Do indicators match known threat actors, malware families, or campaigns?
-- TTPs: What tactics, techniques, and procedures are evident?
-- Infrastructure: Are there connections to known malicious infrastructure?
-**STEP 3: Contextual Analysis**
-- Targeting: Who are the likely targets (industry, geography, organization type)?
-- Motivation: What is the threat actor's objective (espionage, financial, disruption)?
-- Capability: What is the sophistication level?
-**STEP 4: Threat Validation**
-- Reputation Analysis: What do threat feeds and databases say about these indicators?
-- Historical Data: Have these indicators been associated with malicious activity?
-- False Positive Check: Could these be legitimate infrastructure or benign activity?
-**STEP 5: Threat Determination**
-- Is there credible evidence of threat activity?
-- What is the confidence level in the threat assessment?
+    EvalType.CYBERSECURITY_MCQ.value: """You are a cybersecurity expert answering multiple-choice questions across various security domains.
+**STEP 1: Question Analysis**
+- What is the core security concept being tested?
+- What domain does this relate to (network security, cryptography, malware analysis, etc.)?
+- What are the key terms and their security implications?
+**STEP 2: Option Evaluation**
+- Analyze each provided option systematically
+- Identify technically correct statements vs incorrect/misleading ones
+- Consider common misconceptions and typical attack patterns
+- Apply security best practices and industry standards
+**STEP 3: Security Context**
+- What are the real-world implications of each option?
+- Are there any security vulnerabilities or misconfigurations mentioned?
+- Does the correct answer align with security frameworks (MITRE ATT&CK, OWASP, etc.)?
+**STEP 4: Answer Selection**
+- Which option best answers the question based on cybersecurity principles?
+- Is there sufficient technical accuracy in the chosen option?
+- Does it align with current security standards and practices?
 Format your response as:
 ANALYSIS:
-[Provide your detailed step-by-step reasoning here, addressing each step above]
-FINAL ANSWER: [0 or 1]
-- Return 1 if a threat IS identified (credible threat activity detected)
-- Return 0 if NO threat is present (benign or insufficient evidence)""",
+[Provide your detailed step-by-step reasoning here, addressing each step above and evaluating each option]
+FINAL ANSWER: [Return the exact label/letter of the correct answer as provided in the dataset]
+""",
 
     EvalType.SQL_INJECTION.value: """You are a SQL injection detection expert with deep knowledge of database security.
 Analyze the provided code or input using this SQL injection assessment framework:

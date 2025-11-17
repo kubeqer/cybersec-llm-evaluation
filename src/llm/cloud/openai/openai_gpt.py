@@ -16,7 +16,7 @@ class OpenAIGPT:
         self.system_prompt: dict[str, str] = SYSTEM_PROMPT
         self.client = OpenAI(api_key=settings.openai_apikey)
 
-    @retry(max_retries=3, delay_seconds=300)
+    @retry(max_retries=15, delay_seconds=120)
     def generate(self, message: str, eval_type: EvalType) -> str:
         completion = self.client.responses.create(
             model=self.model_config.model_name,
