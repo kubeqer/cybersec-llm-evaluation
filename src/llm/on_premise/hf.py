@@ -3,9 +3,9 @@ from huggingface_hub import InferenceClient
 from src.core.decorators.log_calls import log_calls
 from src.core.decorators.retry import retry
 from src.core.settings.settings import settings
-from src.llm.consts import SYSTEM_PROMPT
 from src.llm.on_premise.schema import HFConfig
 from src.llm.schema import EvalType
+from src.llm.system_prompts import SYSTEM_PROMPT
 
 
 class HF:
