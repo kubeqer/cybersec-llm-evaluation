@@ -24,7 +24,6 @@ class LLMEvaluator:
     def evaluate(
             self, data: list[InputAnswerDict], max_samples: int | None = None
     ) -> EvalResult | None:
-        """Main evaluation method"""
         if not data:
             logger.warning("Empty data provided for evaluation")
             return None
@@ -130,22 +129,18 @@ class LLMEvaluator:
 
     @staticmethod
     def _normalize_output(output: int | str) -> int:
-        """
-        Output normalization that handles various response formats.
-
-        Patterns handled:
-        - "0" or "1" (direct)
-        - "Vulnerable: 0" or "Vulnerable: 1"
-        - "Is phishing: 1"
-        - "0\nExplanation..." (multi-line)
-        - "The answer is 0"
-        - And more...
-        """
         try:
             output_str = str(output).strip()
             if not output_str:
                 logger.warning(f"Empty output")
                 return -1
+            final_answer_match = re.search(
+                r'FINAL\s+ANSWER\s*:\s*([01])',
+                output_str,
+                re.IGNORECASE
+            )
+            if final_answer_match:
+                return int(final_answer_match.group(1))
             if output_str[0] in ('0', '1'):
                 return int(output_str[0])
             colon_match = re.search(r':\s*([01])', output_str)
