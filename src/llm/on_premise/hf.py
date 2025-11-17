@@ -22,7 +22,7 @@ class HF:
         )
 
     @log_calls(level="INFO")
-    @retry(max_retries=3, delay_seconds=300)
+    @retry(max_retries=15, delay_seconds=120)
     def generate(self, message: str, eval_type: EvalType) -> str:
         completion = self.client.chat.completions.create(
             model=self.model_config.model_name,

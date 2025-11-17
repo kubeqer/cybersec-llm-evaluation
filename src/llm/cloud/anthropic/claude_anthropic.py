@@ -15,10 +15,10 @@ class ClaudeAnthropic:
     ):
         self.model_config: AnthropicConfig = model_config
         self.system_prompt: dict[str, str] = SYSTEM_PROMPT
-        self.client = anthropic.Anthropic(auth_token=settings.anthropic_token)
+        self.client = anthropic.Anthropic(api_key=settings.anthropic_token)
 
     @log_calls(level="INFO")
-    @retry(max_retries=3, delay_seconds=300)
+    @retry(max_retries=15, delay_seconds=120)
     def generate(self, message: str, eval_type: EvalType) -> str:
         # noinspection PyTypeChecker
         completion = self.client.messages.create(
@@ -29,4 +29,4 @@ class ClaudeAnthropic:
             ],
             **self.model_config.to_generation_params(),
         )
-        return str(completion.choices[0].message)
+        return str(completion.content)

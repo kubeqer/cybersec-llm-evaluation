@@ -15,9 +15,6 @@ class ModelConfig:
         params = {
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
-            "top_p": self.top_p,
-            "top_k": self.top_k,
-            "repetition_penalty": self.repetition_penalty,
         }
         return {k: v for k, v in params.items() if v is not None}
 
@@ -29,7 +26,7 @@ class EvalType(Enum):
     MALWARE_ANALYSIS = "malware_analysis"
     INTRUSION_DETECTION = "intrusion_detection"
     INCIDENT_RESPONSE = "incident_response"
-    THREAT_INTELLIGENCE = "threat_intelligence"
+    CYBERSECURITY_MCQ = "cybersecurity_mcq"
     VULNERABILITY_ASSESSMENT = "vulnerability_assessment"
     SQL_INJECTION = "sql_injection"
     XSS_DETECTION = "xss_detection"

@@ -20,7 +20,7 @@ class GoogleGemini:
         self.client = genai.Client(api_key=settings.google_apikey)
 
     @log_calls(level="INFO")
-    @retry(max_retries=3, delay_seconds=300)
+    @retry(max_retries=15, delay_seconds=120)
     def generate(self, message: str, eval_type: EvalType) -> str | None:
         completion = self.client.models.generate_content(
             model=self.model_config.model_name,
