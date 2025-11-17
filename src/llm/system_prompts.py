@@ -1,6 +1,6 @@
 from src.llm.schema import EvalType
 
-COT_SYSTEM_PROMPT: dict[str, str] = {
+SYSTEM_PROMPT: dict[str, str] = {
     EvalType.CODE_SECURITY.value: """You are a code security expert with deep expertise in identifying vulnerabilities.
 Analyze the provided code using the following chain-of-thought reasoning process:
 **STEP 1: Code Understanding**
