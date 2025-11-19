@@ -301,20 +301,20 @@ def initialize_all_models():
     models = []
 
     # Anthropic Claude models
-    logger.info("\n--- Anthropic Claude Models ---")
-    try:
-        models.append(
-            ClaudeAnthropic(
-                model_config=AnthropicConfig(
-                    model_name="claude-sonnet-4-5",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Claude Sonnet 4.5")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Claude Sonnet 4.0: {e}")
+    # logger.info("\n--- Anthropic Claude Models ---")
+    # try:
+    #     models.append(
+    #         ClaudeAnthropic(
+    #             model_config=AnthropicConfig(
+    #                 model_name="claude-sonnet-4-5",
+    #                 max_tokens=2048,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized Claude Sonnet 4.5")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize Claude Sonnet 4.0: {e}")
 
     # Google Gemini models
     logger.info("\n--- Google Gemini Models ---")
@@ -346,99 +346,85 @@ def initialize_all_models():
     except Exception as e:
         logger.warning(f"✗ Failed to initialize Gemini 2.5 Pro: {e}")
 
-    try:
-        models.append(
-            GoogleGemini(
-                model_config=GoogleConfig(
-                    model_name="gemini-2.5-flash",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Gemini 2.5 Flash")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Gemini 2.5 Flash: {e}")
-
     # OpenAI GPT models
-    logger.info("\n--- OpenAI GPT Models ---")
-
-    # GPT-5.1
-    try:
-        models.append(
-            OpenAIGPT(
-                model_config=OpenAIConfig(
-                    model_name="gpt-5.1",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized GPT-5.1")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize GPT-5.1: {e}")
-
-    # GPT-5.1 Codex
-    try:
-        models.append(
-            OpenAIGPT(
-                model_config=OpenAIConfig(
-                    model_name="gpt-5.1-codex",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized GPT-5.1 Codex")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize GPT-5.1 Codex: {e}")
-
-    # GPT-5 Nano
-    try:
-        models.append(
-            OpenAIGPT(
-                model_config=OpenAIConfig(
-                    model_name="gpt-5-nano",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized GPT-5 Nano")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize GPT-5 Nano: {e}")
-    # xAI Grok models
-    logger.info("\n--- xAI Grok Models ---")
-
-    # Grok-4 Fast Reasoning (most powerful current model)
-    try:
-        models.append(
-            Grok(
-                model_config=GrokConfig(
-                    model_name="grok-4-fast-reasoning",
-                    max_tokens=8192,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Grok-4 Fast Reasoning")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Grok-4 Fast Reasoning: {e}")
-
-    # Grok Code Fast (optimized for code generation & reasoning)
-    try:
-        models.append(
-            Grok(
-                model_config=GrokConfig(
-                    model_name="grok-code-fast-1",
-                    max_tokens=8192,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Grok Code Fast 1")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Grok Code Fast: {e}")
+    # logger.info("\n--- OpenAI GPT Models ---")
+    #
+    # # GPT-5.1
+    # try:
+    #     models.append(
+    #         OpenAIGPT(
+    #             model_config=OpenAIConfig(
+    #                 model_name="gpt-5.1",
+    #                 max_tokens=2048,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized GPT-5.1")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize GPT-5.1: {e}")
+    #
+    # # GPT-5.1 Codex
+    # try:
+    #     models.append(
+    #         OpenAIGPT(
+    #             model_config=OpenAIConfig(
+    #                 model_name="gpt-5.1-codex",
+    #                 max_tokens=2048,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized GPT-5.1 Codex")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize GPT-5.1 Codex: {e}")
+    #
+    # # GPT-5 Nano
+    # try:
+    #     models.append(
+    #         OpenAIGPT(
+    #             model_config=OpenAIConfig(
+    #                 model_name="gpt-5-nano",
+    #                 max_tokens=2048,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized GPT-5 Nano")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize GPT-5 Nano: {e}")
+    # # xAI Grok models
+    # logger.info("\n--- xAI Grok Models ---")
+    #
+    # # Grok-4 Fast Reasoning (most powerful current model)
+    # try:
+    #     models.append(
+    #         Grok(
+    #             model_config=GrokConfig(
+    #                 model_name="grok-4-fast-reasoning",
+    #                 max_tokens=8192,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized Grok-4 Fast Reasoning")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize Grok-4 Fast Reasoning: {e}")
+    #
+    # # Grok Code Fast (optimized for code generation & reasoning)
+    # try:
+    #     models.append(
+    #         Grok(
+    #             model_config=GrokConfig(
+    #                 model_name="grok-code-fast-1",
+    #                 max_tokens=8192,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized Grok Code Fast 1")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize Grok Code Fast: {e}")
 
     # Hugging Face models (examples with popular cybersecurity-relevant models)
     logger.info("\n--- Hugging Face Models ---")
@@ -486,7 +472,7 @@ def load_all_datasets():
 
     datasets = {}
 
-    # # Phishing Emails Dataset
+    # Phishing Emails Dataset
     logger.info("\n--- Phishing Emails Dataset ---")
     try:
         logger.info("Loading Phishing Emails Dataset...")
