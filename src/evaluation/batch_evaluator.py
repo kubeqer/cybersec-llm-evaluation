@@ -24,7 +24,6 @@ class BatchEvaluator:
     ) -> EvalResult:
         try:
             from src.evaluation.evaluator import LLMEvaluator
-
             evaluator = LLMEvaluator(llm_model=model, eval_type=eval_type)
             logger.info(
                 f"Starting evaluation for model: {model.model_config.model_name}"
@@ -50,7 +49,6 @@ class BatchEvaluator:
             max_workers = len(self.llm_models)
         logger.info(f"Starting evaluation with {max_workers} parallel threads")
         results = []
-
         executor = ThreadPoolExecutor(max_workers=max_workers)
         try:
             futures = {}
@@ -73,7 +71,7 @@ class BatchEvaluator:
                 idx, model = futures[future]
 
                 try:
-                    result = future.result(timeout=600)  # 10 minute timeout per model
+                    result = future.result(timeout=600)
                     results.append(result)
                     logger.info(
                         f"✓ Model {idx + 1}/{len(self.llm_models)} "
