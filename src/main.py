@@ -17,6 +17,8 @@ from src.llm.cloud.anthropic.claude_anthropic import ClaudeAnthropic
 from src.llm.cloud.anthropic.schema import AnthropicConfig
 from src.llm.cloud.openai.openai_gpt import OpenAIGPT
 from src.llm.cloud.openai.schema import OpenAIConfig
+from src.llm.cloud.xai.schema import GrokConfig
+from src.llm.cloud.xai.xai_grok import Grok
 from src.llm.on_premise.hf import HF
 from src.llm.on_premise.schema import HFConfig
 from src.llm.schema import EvalType
@@ -217,6 +219,7 @@ def run_evaluations(models, datasets, max_samples=None, max_workers=None):
                 "eval_type": eval_type.value,
                 "results": results,
             }
+            save_results(all_results, datetime.now().strftime("%Y%m%d_%H%M%S"))
             logger.info(f"✓ Completed evaluation for {dataset_info['name']}")
         except Exception as e:
             logger.error(f"✗ Failed evaluation for {dataset_info['name']}: {e}")
@@ -291,9 +294,8 @@ def print_summary(results: dict):
 
 
 def initialize_all_models():
-    """Initialize ALL available LLM models for comprehensive evaluation"""
     logger.info("=" * 80)
-    logger.info("Initializing ALL LLM models...")
+    logger.info("Initializing LLM models...")
     logger.info("=" * 80)
 
     models = []
@@ -310,26 +312,26 @@ def initialize_all_models():
                 )
             )
         )
-        logger.info("✓ Initialized Claude Sonnet 4.0")
+        logger.info("✓ Initialized Claude Sonnet 4.5")
     except Exception as e:
         logger.warning(f"✗ Failed to initialize Claude Sonnet 4.0: {e}")
 
+    # Google Gemini models
+    logger.info("\n--- Google Gemini Models ---")
     try:
         models.append(
-            ClaudeAnthropic(
-                model_config=AnthropicConfig(
-                    model_name="claude-opus-4-1",
+            GoogleGemini(
+                model_config=GoogleConfig(
+                    model_name="gemini-3-pro-preview",
                     max_tokens=2048,
                     temperature=0.0,
                 )
             )
         )
-        logger.info("✓ Initialized Claude Opus 4.1")
+        logger.info("✓ Initialized Gemini 3 Pro")
     except Exception as e:
-        logger.warning(f"✗ Failed to initialize Claude Opus 4.1: {e}")
+        logger.warning(f"✗ Failed to initialize Gemini 3 Pro: {e}")
 
-    # Google Gemini models
-    logger.info("\n--- Google Gemini Models ---")
     try:
         models.append(
             GoogleGemini(
@@ -361,21 +363,6 @@ def initialize_all_models():
     # OpenAI GPT models
     logger.info("\n--- OpenAI GPT Models ---")
 
-    # GPT-5 Pro
-    try:
-        models.append(
-            OpenAIGPT(
-                model_config=OpenAIConfig(
-                    model_name="gpt-5-pro",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized GPT-5 Pro")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize GPT-5 Pro: {e}")
-
     # GPT-5.1
     try:
         models.append(
@@ -406,21 +393,6 @@ def initialize_all_models():
     except Exception as e:
         logger.warning(f"✗ Failed to initialize GPT-5.1 Codex: {e}")
 
-    # GPT-5
-    try:
-        models.append(
-            OpenAIGPT(
-                model_config=OpenAIConfig(
-                    model_name="gpt-5",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized GPT-5")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize GPT-5: {e}")
-
     # GPT-5 Nano
     try:
         models.append(
@@ -435,6 +407,39 @@ def initialize_all_models():
         logger.info("✓ Initialized GPT-5 Nano")
     except Exception as e:
         logger.warning(f"✗ Failed to initialize GPT-5 Nano: {e}")
+    # xAI Grok models
+    logger.info("\n--- xAI Grok Models ---")
+
+    # Grok-4 Fast Reasoning (most powerful current model)
+    try:
+        models.append(
+            Grok(
+                model_config=GrokConfig(
+                    model_name="grok-4-fast-reasoning",
+                    max_tokens=8192,
+                    temperature=0.0,
+                )
+            )
+        )
+        logger.info("✓ Initialized Grok-4 Fast Reasoning")
+    except Exception as e:
+        logger.warning(f"✗ Failed to initialize Grok-4 Fast Reasoning: {e}")
+
+    # Grok Code Fast (optimized for code generation & reasoning)
+    try:
+        models.append(
+            Grok(
+                model_config=GrokConfig(
+                    model_name="grok-code-fast-1",
+                    max_tokens=8192,
+                    temperature=0.0,
+                )
+            )
+        )
+        logger.info("✓ Initialized Grok Code Fast 1")
+    except Exception as e:
+        logger.warning(f"✗ Failed to initialize Grok Code Fast: {e}")
+
     # Hugging Face models (examples with popular cybersecurity-relevant models)
     logger.info("\n--- Hugging Face Models ---")
     # try:
@@ -481,7 +486,7 @@ def load_all_datasets():
 
     datasets = {}
 
-    # Phishing Emails Dataset
+    # # Phishing Emails Dataset
     logger.info("\n--- Phishing Emails Dataset ---")
     try:
         logger.info("Loading Phishing Emails Dataset...")
@@ -496,7 +501,7 @@ def load_all_datasets():
     except Exception as e:
         logger.error(f"✗ Failed to load Phishing Emails Dataset: {e}")
 
-    # Phishing Website Dataset
+    # # Phishing Website Dataset
     logger.info("\n--- Phishing Website Dataset ---")
     try:
         logger.info("Loading Phishing Website Dataset...")
@@ -510,8 +515,6 @@ def load_all_datasets():
         logger.info(f"✓ Loaded {len(data)} phishing website samples")
     except Exception as e:
         logger.error(f"✗ Failed to load Phishing Website Dataset: {e}")
-
-    # BigVul Dataset
     logger.info("\n--- BigVul Code Vulnerability Dataset ---")
     try:
         logger.info("Loading BigVul (Code Vulnerability) Dataset...")
@@ -540,8 +543,6 @@ def load_all_datasets():
         logger.info(f"✓ Loaded {len(data)} CyberBench Q&A samples")
     except Exception as e:
         logger.error(f"✗ Failed to load CyberBench Dataset: {e}")
-
-    # SecBench Q&A Dataset
     logger.info("\n--- SecBench Q&A Dataset ---")
     try:
         logger.info("Loading SecBench Q&A Dataset...")
@@ -549,7 +550,7 @@ def load_all_datasets():
         data = loader.load()
         datasets["secbench"] = {
             "data": data,
-            "eval_type": EvalType.CYBERSECURITY_MCQ,  # Using a general cybersecurity eval type
+            "eval_type": EvalType.CYBERSECURITY_MCQ,
             "name": "SecBench Q&A",
         }
         logger.info(f"✓ Loaded {len(data)} SecBench Q&A samples")
@@ -563,16 +564,6 @@ def load_all_datasets():
 
 
 def main_comprehensive():
-    """
-    Comprehensive main function that tests EVERY dataset with EVERY LLM model.
-
-    This function will:
-    - Initialize all available LLM models (Claude, Gemini, OpenAI, Hugging Face)
-    - Load all available datasets (BigVul, Phishing Emails, Phishing Websites, CyberBench, SecBench)
-    - Run comprehensive evaluations for each model on each dataset
-    - Save detailed results with timestamp
-    - Print comprehensive summary
-    """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Setup logging
@@ -615,16 +606,11 @@ def main_comprehensive():
         results = run_evaluations(
             models=models,
             datasets=datasets,
-            max_samples=20,  # Limit to 1000 samples per dataset (set to None for all data)
-            max_workers=None,  # Use all available CPU cores
+            max_samples=150,
+            max_workers=None,
         )
-
-        # Save results
         results_file = save_results(results, timestamp)
-
-        # Print comprehensive summary
         print_summary(results)
-
         logger.info("\n" + "=" * 80)
         logger.info("COMPREHENSIVE EVALUATION COMPLETED SUCCESSFULLY!")
         logger.info("=" * 80)
@@ -638,56 +624,5 @@ def main_comprehensive():
         raise
 
 
-def main():
-    """Main pipeline execution"""
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-    # Setup
-    logging_setup()
-
-    try:
-        # Initialize models
-        models = initialize_models()
-
-        if not models:
-            logger.error("No models were successfully initialized. Exiting.")
-            return
-
-        # Load datasets
-        datasets = load_datasets()
-
-        if not datasets:
-            logger.error("No datasets were successfully loaded. Exiting.")
-            return
-
-        # Run evaluations
-        # Set max_samples to limit evaluation size (None = use all data)
-        # Set max_workers to control parallelism (None = use CPU count)
-        results = run_evaluations(
-            models=models,
-            datasets=datasets,
-            max_samples=20,  # Limit to 100 samples per dataset for faster testing
-            max_workers=None,  # Use all available CPU cores
-        )
-
-        # Save results
-        results_file = save_results(results, timestamp)
-
-        # Print summary
-        print_summary(results)
-
-        logger.info("\n" + "=" * 80)
-        logger.info("Pipeline Completed Successfully")
-        logger.info(f"Results saved to: {results_file}")
-        logger.info("=" * 80)
-
-    except Exception as e:
-        logger.error(f"Pipeline failed with error: {e}", exc_info=True)
-        raise
-
-
 if __name__ == "__main__":
-    # main()
-    # Use main_comprehensive() to test ALL datasets with ALL models
-    # Use main() for the original limited testing
     main_comprehensive()

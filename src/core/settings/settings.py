@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     anthropic_token: str = Field(alias="ANTHROPIC_TOKEN")
     google_apikey: str = Field(alias="GOOGLE_API_KEY")
     openai_apikey: str = Field(alias="OPENAI_API_KEY")
+    xai_api_key: str = Field(alias="XAI_API_KEY")
 
 
 settings = Settings()  # type: ignore

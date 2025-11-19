@@ -129,38 +129,88 @@ class LLMEvaluator:
 
     @staticmethod
     def _normalize_output(output: int | str) -> int:
+        """
+        Normalize output to an integer index.
+        For binary: 0 or 1
+        For multiple-choice: 0=A, 1=B, 2=C, 3=D
+        Returns -1 if parsing fails.
+        """
         try:
             output_str = str(output).strip()
             if not output_str:
                 logger.warning(f"Empty output")
                 return -1
+
+            # Try to find "FINAL ANSWER: X" pattern (supports both letters and numbers)
             final_answer_match = re.search(
-                r'FINAL\s+ANSWER\s*:\s*([01])',
+                r'FINAL\s+ANSWER\s*:\s*([A-Da-d01])',
                 output_str,
                 re.IGNORECASE
             )
             if final_answer_match:
-                return int(final_answer_match.group(1))
-            if output_str[0] in ('0', '1'):
-                return int(output_str[0])
+                char = final_answer_match.group(1).upper()
+                if char in ('A', 'B', 'C', 'D'):
+                    return ord(char) - ord('A')
+                return int(char)
+
+            # Try to find answer in common formats (letters)
+            answer_pattern = re.search(
+                r'(?:answer is|答案是|答案：)\s*([A-Da-d])',
+                output_str,
+                re.IGNORECASE
+            )
+            if answer_pattern:
+                letter = answer_pattern.group(1).upper()
+                return ord(letter) - ord('A')
+
+            # Look for boxed answer like $\boxed{B}$ or $\boxed{1}$
+            boxed_match = re.search(r'\{([A-Da-d01])\}', output_str)
+            if boxed_match:
+                char = boxed_match.group(1).upper()
+                if char in ('A', 'B', 'C', 'D'):
+                    return ord(char) - ord('A')
+                return int(char)
+
+            # If first character is a valid option
+            first_char = output_str[0].upper()
+            if first_char in ('A', 'B', 'C', 'D'):
+                return ord(first_char) - ord('A')
+            if first_char in ('0', '1'):
+                return int(first_char)
+
+            # Try colon format for binary (e.g., "Answer: 1")
             colon_match = re.search(r':\s*([01])', output_str)
             if colon_match:
                 return int(colon_match.group(1))
+
+            # Try to find any standalone letter A-D
+            letter_match = re.search(r'\b([A-Da-d])\b', output_str)
+            if letter_match:
+                letter = letter_match.group(1).upper()
+                return ord(letter) - ord('A')
+
+            # Try to find standalone binary digits
             digits = re.findall(r'\b([01])\b', output_str)
             if digits:
                 return int(digits[0])
+
+            # Check for semantic keywords (for binary classification)
             output_lower = output_str.lower()
             if 'zero' in output_lower or 'not vulnerable' in output_lower or 'not phishing' in output_lower or 'safe' in output_lower or 'legitimate' in output_lower:
                 return 0
             if 'one' in output_lower or 'vulnerable' in output_lower or 'phishing' in output_lower or 'malicious' in output_lower:
                 return 1
+
+            # Last resort: find any number that could be valid
             numbers = re.findall(r'\d+', output_str)
             for num in numbers:
                 val = int(num)
-                if val in (0, 1):
+                if val in (0, 1, 2, 3):  # Extended to support 0-3 for A-D
                     return val
+
             logger.warning(f"Cannot parse output: {output_str[:100]}")
             return -1
+
         except (ValueError, TypeError, IndexError) as e:
             logger.warning(f"Error parsing output: {output} - {e}")
             return -1
