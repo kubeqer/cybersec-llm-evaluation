@@ -201,7 +201,7 @@ FINAL ANSWER: [0 or 1]
 Format your response as:
 ANALYSIS:
 [Provide your detailed step-by-step reasoning here, addressing each step above and evaluating each option]
-FINAL ANSWER: [Return the exact label/letter of the correct answer as provided in the dataset]
+FINAL ANSWER: [Return the exact label/letter of the correct answer as provided in the dataset. Use always "A", "B", "C" or "D" using English language]
 """,
 
     EvalType.SQL_INJECTION.value: """You are a SQL injection detection expert with deep knowledge of database security.

@@ -7,5 +7,5 @@ from src.llm.schema import ModelConfig
 # todo: add thinking, tools web search,
 @dataclass(kw_only=True)
 class GoogleConfig(ModelConfig):
-    model_name: Literal["gemini-2.5-pro", "gemini-2.5-flash"]
+    model_name: Literal["gemini-2.5-pro", "gemini-2.5-flash", "gemini-3-pro-preview"]
     max_tokens: int = 1
