@@ -20,15 +20,20 @@ class ModelConfig:
 
 
 class EvalType(Enum):
-    CODE_SECURITY = "code_security"
-    LOGS_ANALYZE = "logs_analyze"
-    PHISHING_DETECTION = "phishing_detection"
-    MALWARE_ANALYSIS = "malware_analysis"
-    INTRUSION_DETECTION = "intrusion_detection"
-    INCIDENT_RESPONSE = "incident_response"
-    CYBERSECURITY_MCQ = "cybersecurity_mcq"
-    VULNERABILITY_ASSESSMENT = "vulnerability_assessment"
-    SQL_INJECTION = "sql_injection"
-    XSS_DETECTION = "xss_detection"
-    DDoS_DETECTION = "ddos_detection"
-    RANSOMWARE_DETECTION = "ransomware_detection"
+    # Binary classification
+    CODE_SECURITY = ("code_security", "binary")
+    PHISHING_DETECTION = ("phishing_detection", "binary")
+    VULNERABILITY_ASSESSMENT = ("vulnerability_assessment", "binary")
+    MALWARE_ANALYSIS = ("malware_analysis", "binary")
+    INTRUSION_DETECTION = ("intrusion_detection", "binary")
+    INCIDENT_RESPONSE = ("incident_response", "binary")
+    SQL_INJECTION = ("sql_injection", "binary")
+    XSS_DETECTION = ("xss_detection", "binary")
+    DDoS_DETECTION = ("ddos_detection", "binary")
+    RANSOMWARE_DETECTION = ("ransomware_detection", "binary")
+
+    CYBERSECURITY_MCQ = ("cybersecurity_mcq", "multiclass")
+
+    def __init__(self, value, task_type):
+        self._value_ = value
+        self.task_type = task_type

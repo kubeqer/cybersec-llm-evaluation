@@ -51,12 +51,13 @@ class LLMEvaluator:
 
     def _evaluate_samples(self, eval_data: list[InputAnswerDict]) -> ConfusionMatrix:
         confusion_matrix = ConfusionMatrix()
+        is_multiclass = self.eval_type.task_type == "multiclass"
         for idx, item in enumerate(eval_data):
             predicted, actual = self._evaluate_single_sample(item, idx)
             if predicted == -1:
                 confusion_matrix.false_negatives += 1
             else:
-                confusion_matrix.update(predicted, actual)
+                confusion_matrix.update(predicted, actual, is_multiclass=is_multiclass)
             if (idx + 1) % 10 == 0:
                 logger.info(f"Evaluated {idx + 1}/{len(eval_data)} samples")
 

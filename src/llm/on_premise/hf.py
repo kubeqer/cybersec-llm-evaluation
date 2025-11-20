@@ -17,7 +17,6 @@ class HF:
         self.system_prompt: dict[str, str] = SYSTEM_PROMPT
         self.client = InferenceClient(
             provider=self.model_config.provider,
-            timeout=self.model_config.timeout,
             token=settings.hf_token,
         )
 
@@ -28,10 +27,10 @@ class HF:
             model=self.model_config.model_name,
             messages=[
                 {
-                    "role": "assistant",
+                    "role": "system",
                     "content": self.system_prompt.get(
                         eval_type.value
-                    ),  # todo: check if it will work correctly on all the models i will use # noqa: E501
+                    ),
                 },
                 {"role": "user", "content": message},
             ],

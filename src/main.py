@@ -24,159 +24,6 @@ from src.llm.on_premise.schema import HFConfig
 from src.llm.schema import EvalType
 
 
-def initialize_models():
-    """Initialize all LLM models for evaluation"""
-    logger.info("Initializing LLM models...")
-
-    models = []
-    #
-    # # Anthropic Claude models
-    # try:
-    #     models.append(
-    #         ClaudeAnthropic(
-    #             model_config=AnthropicConfig(
-    #                 model_name="claude-sonnet-4-0",
-    #                 max_tokens=1,
-    #                 temperature=0.0,
-    #             )
-    #         )
-    #     )
-    #     logger.info("✓ Initialized Claude Sonnet 4.0")
-    # except Exception as e:
-    #     logger.warning(f"✗ Failed to initialize Claude Sonnet 4.0: {e}")
-    #
-    # try:
-    #     models.append(
-    #         ClaudeAnthropic(
-    #             model_config=AnthropicConfig(
-    #                 model_name="claude-opus-4-1",
-    #                 max_tokens=1,
-    #                 temperature=0.0,
-    #             )
-    #         )
-    #     )
-    #     logger.info("✓ Initialized Claude Opus 4.1")
-    # except Exception as e:
-    #     logger.warning(f"✗ Failed to initialize Claude Opus 4.1: {e}")
-    #
-    # # Google Gemini models
-    try:
-        models.append(
-            GoogleGemini(
-                model_config=GoogleConfig(
-                    model_name="gemini-2.5-pro",
-                    max_tokens=1,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Gemini 2.5 Pro")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Gemini 2.5 Pro: {e}")
-
-    try:
-        models.append(
-            GoogleGemini(
-                model_config=GoogleConfig(
-                    model_name="gemini-2.5-flash",
-                    max_tokens=1,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Gemini 2.5 Flash")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Gemini 2.5 Flash: {e}")
-
-    # # OpenAI GPT models
-    # try:
-    #     models.append(
-    #         OpenAIGPT(
-    #             model_config=OpenAIConfig(
-    #                 model_name="gpt-5",
-    #                 max_tokens=1,
-    #                 temperature=0.0,
-    #             )
-    #         )
-    #     )
-    #     logger.info("✓ Initialized GPT-5")
-    # except Exception as e:
-    #     logger.warning(f"✗ Failed to initialize GPT-5: {e}")
-    #
-    # # Hugging Face models (examples - add more as needed)
-    # try:
-    #     models.append(
-    #         HF(
-    #             model_config=HFConfig(
-    #                 model_name="meta-llama/Llama-3.3-70B-Instruct",
-    #                 provider="auto",
-    #                 max_tokens=1,
-    #                 temperature=0.0,
-    #             )
-    #         )
-    #     )
-    #     logger.info("✓ Initialized Llama 3.3 70B")
-    # except Exception as e:
-    #     logger.warning(f"✗ Failed to initialize Llama 3.3 70B: {e}")
-
-    logger.info(f"Total models initialized: {len(models)}")
-    return models
-
-
-def load_datasets():
-    """Load all available datasets"""
-    logger.info("\n" + "=" * 80)
-    logger.info("Loading Datasets")
-    logger.info("=" * 80)
-
-    datasets = {}
-
-    # # Phishing Emails Dataset
-    # try:
-    #     logger.info("Loading Phishing Emails Dataset...")
-    #     loader = PhishingEmailsDataLoader()
-    #     data = loader.load()
-    #     datasets["phishing_emails"] = {
-    #         "data": data,
-    #         "eval_type": EvalType.PHISHING_DETECTION,
-    #         "name": "Phishing Emails",
-    #     }
-    #     logger.info(f"✓ Loaded {len(data)} phishing email samples")
-    # except Exception as e:
-    #     logger.error(f"✗ Failed to load Phishing Emails Dataset: {e}")
-
-    # Phishing Website Dataset
-    # try:
-    #     logger.info("Loading Phishing Website Dataset...")
-    #     loader = PhishingWebsiteDataLoader()
-    #     data = loader.load()
-    #     datasets["phishing_websites"] = {
-    #         "data": data,
-    #         "eval_type": EvalType.PHISHING_DETECTION,
-    #         "name": "Phishing Websites",
-    #     }
-    #     logger.info(f"✓ Loaded {len(data)} phishing website samples")
-    # except Exception as e:
-    #     logger.error(f"✗ Failed to load Phishing Website Dataset: {e}")
-
-    # BigVul Dataset
-    try:
-        logger.info("Loading BigVul (Code Vulnerability) Dataset...")
-        loader = BigVulDataLoader()
-        data = loader.load()
-        datasets["bigvul"] = {
-            "data": data,
-            "eval_type": EvalType.CODE_SECURITY,
-            "name": "BigVul Code Vulnerabilities",
-        }
-        logger.info(f"✓ Loaded {len(data)} code vulnerability samples")
-    except Exception as e:
-        logger.error(f"✗ Failed to load BigVul Dataset: {e}")
-
-    logger.info(f"\nTotal datasets loaded: {len(datasets)}")
-    return datasets
-
-
 def run_evaluations(models, datasets, max_samples=None, max_workers=None):
     """Run evaluations for all models on all datasets"""
     logger.info("\n" + "=" * 80)
@@ -300,7 +147,7 @@ def initialize_all_models():
 
     models = []
 
-    # Anthropic Claude models
+    # # Anthropic Claude models
     # logger.info("\n--- Anthropic Claude Models ---")
     # try:
     #     models.append(
@@ -315,8 +162,8 @@ def initialize_all_models():
     #     logger.info("✓ Initialized Claude Sonnet 4.5")
     # except Exception as e:
     #     logger.warning(f"✗ Failed to initialize Claude Sonnet 4.0: {e}")
-
-    # Google Gemini models
+    #
+    # # Google Gemini models
     logger.info("\n--- Google Gemini Models ---")
     try:
         models.append(
@@ -331,22 +178,22 @@ def initialize_all_models():
         logger.info("✓ Initialized Gemini 3 Pro")
     except Exception as e:
         logger.warning(f"✗ Failed to initialize Gemini 3 Pro: {e}")
-
-    try:
-        models.append(
-            GoogleGemini(
-                model_config=GoogleConfig(
-                    model_name="gemini-2.5-pro",
-                    max_tokens=2048,
-                    temperature=0.0,
-                )
-            )
-        )
-        logger.info("✓ Initialized Gemini 2.5 Pro")
-    except Exception as e:
-        logger.warning(f"✗ Failed to initialize Gemini 2.5 Pro: {e}")
-
-    # OpenAI GPT models
+    #
+    # try:
+    #     models.append(
+    #         GoogleGemini(
+    #             model_config=GoogleConfig(
+    #                 model_name="gemini-2.5-pro",
+    #                 max_tokens=2048,
+    #                 temperature=0.0,
+    #             )
+    #         )
+    #     )
+    #     logger.info("✓ Initialized Gemini 2.5 Pro")
+    # except Exception as e:
+    #     logger.warning(f"✗ Failed to initialize Gemini 2.5 Pro: {e}")
+    #
+    # # OpenAI GPT models
     # logger.info("\n--- OpenAI GPT Models ---")
     #
     # # GPT-5.1
@@ -427,36 +274,80 @@ def initialize_all_models():
     #     logger.warning(f"✗ Failed to initialize Grok Code Fast: {e}")
 
     # Hugging Face models (examples with popular cybersecurity-relevant models)
-    logger.info("\n--- Hugging Face Models ---")
+    # logger.info("\n--- Hugging Face Models ---")
     # try:
     #     models.append(
     #         HF(
     #             model_config=HFConfig(
-    #                 model_name="meta-llama/Llama-3.3-70B-Instruct",
+    #                 model_name="deepseek-ai/DeepSeek-V3.1",
     #                 provider="auto",
     #                 max_tokens=2048,
     #                 temperature=0.0,
     #             )
     #         )
     #     )
-    #     logger.info("✓ Initialized Llama 3.3 70B Instruct")
+    #     logger.info("✓ Initialized DeepSeek V3.1")
     # except Exception as e:
-    #     logger.warning(f"✗ Failed to initialize Llama 3.3 70B: {e}")
+    #     logger.warning(f"✗ Failed to initialize DeepSeek V3.1: {e}")
+    # # try:
+    # #     models.append(
+    # #         HF(
+    # #             model_config=HFConfig(
+    # #                 model_name="deepseek-ai/DeepSeek-V3.2-Exp",
+    # #                 provider="auto",
+    # #                 max_tokens=2048,
+    # #                 temperature=0.0,
+    # #             )
+    # #         )
+    # #     )
+    # #     logger.info("✓ Initialized Deepseek V3.2 EXP")
+    # # except Exception as e:
+    # #     logger.warning(f"✗ Failed to initialize Deepseek V3.2 EXP: {e}")
+    # #
+    # # try:
+    # #     models.append(
+    # #         HF(
+    # #             model_config=HFConfig(
+    # #                 model_name="Qwen/Qwen3-Coder-30B-A3B-Instruct",
+    # #                 provider="auto",
+    # #                 max_tokens=2048,
+    # #                 temperature=0.0,
+    # #             )
+    # #         )
+    # #     )
+    # #     logger.info("✓ Initialized Qwen 3 Coder Instruct")
+    # # except Exception as e:
+    # #     logger.warning(f"✗ Failed to initialize Qwen 3 Coder Instruct: {e}")
+    # #
+    # # try:
+    # #     models.append(
+    # #         HF(
+    # #             model_config=HFConfig(
+    # #                 model_name="meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+    # #                 provider="auto",
+    # #                 max_tokens=2048,
+    # #                 temperature=0.0,
+    # #             )
+    # #         )
+    # #     )
+    # #     logger.info("✓ Initialized Llama 4 Maverick Instruct")
+    # # except Exception as e:
+    # #     logger.warning(f"✗ Failed to initialize Llama 4 Maverick Instruct: {e}")
     #
     # try:
     #     models.append(
     #         HF(
     #             model_config=HFConfig(
-    #                 model_name="Qwen/Qwen2.5-72B-Instruct",
+    #                 model_name="openai/gpt-oss-120b",
     #                 provider="auto",
     #                 max_tokens=2048,
     #                 temperature=0.0,
     #             )
     #         )
     #     )
-    #     logger.info("✓ Initialized Qwen 2.5 72B Instruct")
+    #     logger.info("✓ Initialized gpt-oss 120b")
     # except Exception as e:
-    #     logger.warning(f"✗ Failed to initialize Qwen 2.5 72B: {e}")
+    #     logger.warning(f"✗ Failed to initialize gpt-oss 120b: {e}")
 
     logger.info(f"\n{'=' * 80}")
     logger.info(f"Total models initialized: {len(models)}")
@@ -473,47 +364,47 @@ def load_all_datasets():
     datasets = {}
 
     # Phishing Emails Dataset
-    logger.info("\n--- Phishing Emails Dataset ---")
-    try:
-        logger.info("Loading Phishing Emails Dataset...")
-        loader = PhishingEmailsDataLoader()
-        data = loader.load()
-        datasets["phishing_emails"] = {
-            "data": data,
-            "eval_type": EvalType.PHISHING_DETECTION,
-            "name": "Phishing Emails",
-        }
-        logger.info(f"✓ Loaded {len(data)} phishing email samples")
-    except Exception as e:
-        logger.error(f"✗ Failed to load Phishing Emails Dataset: {e}")
-
-    # # Phishing Website Dataset
-    logger.info("\n--- Phishing Website Dataset ---")
-    try:
-        logger.info("Loading Phishing Website Dataset...")
-        loader = PhishingWebsiteDataLoader()
-        data = loader.load()
-        datasets["phishing_websites"] = {
-            "data": data,
-            "eval_type": EvalType.PHISHING_DETECTION,
-            "name": "Phishing Websites",
-        }
-        logger.info(f"✓ Loaded {len(data)} phishing website samples")
-    except Exception as e:
-        logger.error(f"✗ Failed to load Phishing Website Dataset: {e}")
-    logger.info("\n--- BigVul Code Vulnerability Dataset ---")
-    try:
-        logger.info("Loading BigVul (Code Vulnerability) Dataset...")
-        loader = BigVulDataLoader()
-        data = loader.load()
-        datasets["bigvul"] = {
-            "data": data,
-            "eval_type": EvalType.CODE_SECURITY,
-            "name": "BigVul Code Vulnerabilities",
-        }
-        logger.info(f"✓ Loaded {len(data)} code vulnerability samples")
-    except Exception as e:
-        logger.error(f"✗ Failed to load BigVul Dataset: {e}")
+    # logger.info("\n--- Phishing Emails Dataset ---")
+    # try:
+    #     logger.info("Loading Phishing Emails Dataset...")
+    #     loader = PhishingEmailsDataLoader()
+    #     data = loader.load()
+    #     datasets["phishing_emails"] = {
+    #         "data": data,
+    #         "eval_type": EvalType.PHISHING_DETECTION,
+    #         "name": "Phishing Emails",
+    #     }
+    #     logger.info(f"✓ Loaded {len(data)} phishing email samples")
+    # except Exception as e:
+    #     logger.error(f"✗ Failed to load Phishing Emails Dataset: {e}")
+    #
+    # # # Phishing Website Dataset
+    # logger.info("\n--- Phishing Website Dataset ---")
+    # try:
+    #     logger.info("Loading Phishing Website Dataset...")
+    #     loader = PhishingWebsiteDataLoader()
+    #     data = loader.load()
+    #     datasets["phishing_websites"] = {
+    #         "data": data,
+    #         "eval_type": EvalType.PHISHING_DETECTION,
+    #         "name": "Phishing Websites",
+    #     }
+    #     logger.info(f"✓ Loaded {len(data)} phishing website samples")
+    # except Exception as e:
+    #     logger.error(f"✗ Failed to load Phishing Website Dataset: {e}")
+    # logger.info("\n--- BigVul Code Vulnerability Dataset ---")
+    # try:
+    #     logger.info("Loading BigVul (Code Vulnerability) Dataset...")
+    #     loader = BigVulDataLoader()
+    #     data = loader.load()
+    #     datasets["bigvul"] = {
+    #         "data": data,
+    #         "eval_type": EvalType.CODE_SECURITY,
+    #         "name": "BigVul Code Vulnerabilities",
+    #     }
+    #     logger.info(f"✓ Loaded {len(data)} code vulnerability samples")
+    # except Exception as e:
+    #     logger.error(f"✗ Failed to load BigVul Dataset: {e}")
 
     # CyberBench Q&A Dataset
     logger.info("\n--- CyberBench Q&A Dataset ---")
