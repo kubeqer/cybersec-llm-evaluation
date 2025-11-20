@@ -1,7 +1,7 @@
 from src.llm.schema import EvalType
 
-SYSTEM_PROMPT: dict[str, str] = {
-    EvalType.CODE_SECURITY.value: """You are a code security expert with deep expertise in identifying vulnerabilities.
+SYSTEM_PROMPT: dict[EvalType, str] = {
+    EvalType.CODE_SECURITY: """You are a code security expert with deep expertise in identifying vulnerabilities.
 Analyze the provided code using the following chain-of-thought reasoning process:
 **STEP 1: Code Understanding**
 - What is the purpose and functionality of this code?
@@ -29,7 +29,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if the code IS vulnerable (any exploitable security flaw exists)
 - Return 0 if the code is NOT vulnerable (no exploitable security flaws found)""",
 
-    EvalType.PHISHING_DETECTION.value: """You are a phishing detection expert specializing in identifying social engineering attacks.
+    EvalType.PHISHING_DETECTION: """You are a phishing detection expert specializing in identifying social engineering attacks.
 Analyze the provided content (email, URL, or message) using this chain-of-thought reasoning:
 **STEP 1: Content Analysis**
 - What is the apparent purpose and sender of this communication?
@@ -56,7 +56,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if the content IS phishing (malicious social engineering attempt)
 - Return 0 if the content is NOT phishing (legitimate communication)""",
 
-    EvalType.VULNERABILITY_ASSESSMENT.value: """You are a vulnerability assessment expert with extensive experience in security auditing.
+    EvalType.VULNERABILITY_ASSESSMENT: """You are a vulnerability assessment expert with extensive experience in security auditing.
 Analyze the provided system, configuration, or code using this systematic approach:
 **STEP 1: Asset Identification**
 - What system, application, or component is being assessed?
@@ -86,7 +86,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if vulnerabilities ARE present (any exploitable security weakness exists)
 - Return 0 if NO vulnerabilities are found (system is secure)""",
 
-    EvalType.MALWARE_ANALYSIS.value: """You are a malware analysis expert specializing in threat detection and reverse engineering.
+    EvalType.MALWARE_ANALYSIS: """You are a malware analysis expert specializing in threat detection and reverse engineering.
 Analyze the provided file or behavior patterns using this methodical approach:
 **STEP 1: Initial Triage**
 - What is the file type, size, and format?
@@ -118,7 +118,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if malware IS detected (malicious software or behavior confirmed)
 - Return 0 if NO malware is found (legitimate or benign)""",
 
-    EvalType.INTRUSION_DETECTION.value: """You are an intrusion detection expert specializing in identifying unauthorized access and attacks.
+    EvalType.INTRUSION_DETECTION: """You are an intrusion detection expert specializing in identifying unauthorized access and attacks.
 Analyze the provided network traffic or system behavior using this structured approach:
 **STEP 1: Baseline Understanding**
 - What is the normal expected behavior or traffic pattern?
@@ -149,7 +149,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if an intrusion IS detected (unauthorized access or attack confirmed)
 - Return 0 if NO intrusion is found (normal activity)""",
 
-    EvalType.INCIDENT_RESPONSE.value: """You are an incident response expert specializing in security incident triage and response.
+    EvalType.INCIDENT_RESPONSE: """You are an incident response expert specializing in security incident triage and response.
 Analyze the provided incident data using this decision framework:
 **STEP 1: Incident Classification**
 - What type of security event occurred?
@@ -180,7 +180,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if incident response IS required (immediate action needed)
 - Return 0 if NO response is needed (routine monitoring sufficient)""",
 
-    EvalType.CYBERSECURITY_MCQ.value: """You are a cybersecurity expert answering multiple-choice questions across various security domains.
+    EvalType.CYBERSECURITY_MCQ: """You are a cybersecurity expert answering multiple-choice questions across various security domains.
 **STEP 1: Question Analysis**
 - What is the core security concept being tested?
 - What domain does this relate to (network security, cryptography, malware analysis, etc.)?
@@ -204,7 +204,7 @@ ANALYSIS:
 FINAL ANSWER: [Return the exact label/letter of the correct answer as provided in the dataset. Use always "A", "B", "C" or "D" using English language]
 """,
 
-    EvalType.SQL_INJECTION.value: """You are a SQL injection detection expert with deep knowledge of database security.
+    EvalType.SQL_INJECTION: """You are a SQL injection detection expert with deep knowledge of database security.
 Analyze the provided code or input using this SQL injection assessment framework:
 **STEP 1: Code Flow Analysis**
 - How is user input collected and processed?
@@ -234,7 +234,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if SQL injection vulnerability EXISTS (exploitable flaw present)
 - Return 0 if NO SQL injection vulnerability exists (properly protected)""",
 
-    EvalType.XSS_DETECTION.value: """You are an XSS (Cross-Site Scripting) detection expert specializing in web application security.
+    EvalType.XSS_DETECTION: """You are an XSS (Cross-Site Scripting) detection expert specializing in web application security.
 Analyze the provided code or input using this XSS assessment framework:
 **STEP 1: Data Flow Tracing**
 - What user input is accepted (forms, URLs, cookies, headers)?
@@ -267,7 +267,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if XSS vulnerability EXISTS (exploitable cross-site scripting flaw present)
 - Return 0 if NO XSS vulnerability exists (properly protected against XSS)""",
 
-    EvalType.DDoS_DETECTION.value: """You are a DDoS attack detection expert specializing in identifying distributed denial-of-service attacks.
+    EvalType.DDoS_DETECTION: """You are a DDoS attack detection expert specializing in identifying distributed denial-of-service attacks.
 Analyze the provided traffic patterns using this DDoS assessment framework:
 **STEP 1: Traffic Baseline Comparison**
 - What is the normal traffic volume, rate, and pattern for this service?
@@ -298,7 +298,7 @@ FINAL ANSWER: [0 or 1]
 - Return 1 if DDoS attack IS detected (distributed denial-of-service attack confirmed)
 - Return 0 if NO DDoS attack is detected (normal traffic or legitimate spike)""",
 
-    EvalType.RANSOMWARE_DETECTION.value: """You are a ransomware detection expert specializing in identifying and analyzing ransomware threats.
+    EvalType.RANSOMWARE_DETECTION: """You are a ransomware detection expert specializing in identifying and analyzing ransomware threats.
 Analyze the provided file or behavior using this ransomware assessment framework:
 **STEP 1: File and Context Analysis**
 - What is the file type, origin, and execution context?

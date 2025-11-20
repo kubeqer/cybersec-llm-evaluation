@@ -38,7 +38,6 @@ class SecBenchDataLoader:
 
     @staticmethod
     def _format_question(row: pd.Series) -> str:
-        """Format the question with options."""
         question = row.get("question", "")
         parts = [question]
         answers = row.get("answers")
@@ -50,5 +49,4 @@ class SecBenchDataLoader:
 
     @staticmethod
     def _extract_answer(row: pd.Series) -> str:
-        """Extract the answer from the row."""
         return str(row.get("label", ""))

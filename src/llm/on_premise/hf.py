@@ -14,12 +14,13 @@ class HF:
         model_config: HFConfig,
     ):
         self.model_config: HFConfig = model_config
-        self.system_prompt: dict[str, str] = SYSTEM_PROMPT
+        self.system_prompt: dict[EvalType, str] = SYSTEM_PROMPT
         self.client = InferenceClient(
             provider=self.model_config.provider,
             token=settings.hf_token,
         )
 
+    @log_calls(level="DEBUG", show_result=True)
     @log_calls(level="INFO")
     @retry(max_retries=15, delay_seconds=120)
     def generate(self, message: str, eval_type: EvalType) -> str:
@@ -28,9 +29,7 @@ class HF:
             messages=[
                 {
                     "role": "system",
-                    "content": self.system_prompt.get(
-                        eval_type.value
-                    ),
+                    "content": self.system_prompt.get(eval_type),
                 },
                 {"role": "user", "content": message},
             ],

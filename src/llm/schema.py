@@ -20,7 +20,6 @@ class ModelConfig:
 
 
 class EvalType(Enum):
-    # Binary classification
     CODE_SECURITY = ("code_security", "binary")
     PHISHING_DETECTION = ("phishing_detection", "binary")
     VULNERABILITY_ASSESSMENT = ("vulnerability_assessment", "binary")
@@ -31,7 +30,6 @@ class EvalType(Enum):
     XSS_DETECTION = ("xss_detection", "binary")
     DDoS_DETECTION = ("ddos_detection", "binary")
     RANSOMWARE_DETECTION = ("ransomware_detection", "binary")
-
     CYBERSECURITY_MCQ = ("cybersecurity_mcq", "multiclass")
 
     def __init__(self, value, task_type):
