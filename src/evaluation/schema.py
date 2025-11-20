@@ -24,15 +24,21 @@ class ConfusionMatrix:
     true_negatives: int = 0
     false_negatives: int = 0
 
-    def update(self, predicted: int, actual: int) -> None:
-        if predicted == 1 and actual == 1:
-            self.true_positives += 1
-        elif predicted == 1 and actual == 0:
-            self.false_positives += 1
-        elif predicted == 0 and actual == 0:
-            self.true_negatives += 1
-        elif predicted == 0 and actual == 1:
-            self.false_negatives += 1
+    def update(self, predicted: int, actual: int, is_multiclass: bool = False) -> None:
+        if is_multiclass:
+            if predicted == actual:
+                self.true_positives += 1
+            else:
+                self.false_negatives += 1
+        else:
+            if predicted == 1 and actual == 1:
+                self.true_positives += 1
+            elif predicted == 1 and actual == 0:
+                self.false_positives += 1
+            elif predicted == 0 and actual == 0:
+                self.true_negatives += 1
+            elif predicted == 0 and actual == 1:
+                self.false_negatives += 1
 
     @property
     def correct(self) -> int:
