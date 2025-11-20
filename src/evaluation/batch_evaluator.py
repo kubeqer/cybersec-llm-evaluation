@@ -24,6 +24,7 @@ class BatchEvaluator:
     ) -> EvalResult:
         try:
             from src.evaluation.evaluator import LLMEvaluator
+
             evaluator = LLMEvaluator(llm_model=model, eval_type=eval_type)
             logger.info(
                 f"Starting evaluation for model: {model.model_config.model_name}"
@@ -40,10 +41,10 @@ class BatchEvaluator:
             raise
 
     def evaluate_all(
-            self,
-            data: list[InputAnswerDict],
-            max_samples: int | None = None,
-            max_workers: int | None = None,
+        self,
+        data: list[InputAnswerDict],
+        max_samples: int | None = None,
+        max_workers: int | None = None,
     ) -> list[EvalResult]:
         if max_workers is None:
             max_workers = len(self.llm_models)
@@ -74,14 +75,16 @@ class BatchEvaluator:
                     result = future.result(timeout=600)
                     results.append(result)
                     logger.info(
-                        f"✓ Model {idx + 1}/{len(self.llm_models)} "
+                        f"Model {idx + 1}/{len(self.llm_models)} "
                         f"completed: {result.correct}/{result.total} correct "
                         f"({result.avg_comprehensiveness:.2f}%)"
                     )
                 except TimeoutError:
-                    logger.error(f"✗ Model {idx + 1}/{len(self.llm_models)} timed out after 600s")
+                    logger.error(
+                        f"Model {idx + 1}/{len(self.llm_models)} timed out after 600s"
+                    )
                 except Exception as e:
-                    logger.error(f"✗ Model {idx + 1}/{len(self.llm_models)} failed: {e}")
+                    logger.error(f"Model {idx + 1}/{len(self.llm_models)} failed: {e}")
 
             logger.info("All futures completed, shutting down executor...")
         finally:

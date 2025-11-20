@@ -11,13 +11,13 @@ class PhishingEmailsDataLoader(BaseDataLoader):
     FILE_PATH = "phishing_legit_dataset_KD_10000.csv"
     FEATURE_COLUMNS = [
         "text",
-        "label",  # 1 = phishing email, 0 = legitimate email.
+        "label",
         "phishing_type",
         "severity",
         "confidence",
     ]
     INPUT_TEMPLATE = "Text: {text} "
-    ANSWER_TEMPLATE = "Is phishing: {label}, Phishing Type: {phishing_type}, "
+    ANSWER_TEMPLATE = "{label}"
 
     def __init__(self):
         super().__init__(dataset_slug=self.DATASET_SLUG, file_path=self.FILE_PATH)

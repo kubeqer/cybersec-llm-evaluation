@@ -1,5 +1,5 @@
-from xai_sdk import Client
-from xai_sdk.chat import user, system
+from xai_sdk import Client  # type: ignore
+from xai_sdk.chat import system, user  # type: ignore
 
 from src.core.decorators.log_calls import log_calls
 from src.core.decorators.retry import retry
@@ -15,13 +15,14 @@ class Grok:
         model_config: GrokConfig,
     ):
         self.model_config = model_config
-        self.system_prompt: dict[str, str] = SYSTEM_PROMPT
+        self.system_prompt: dict[EvalType, str] = SYSTEM_PROMPT
         self.client = Client(api_key=settings.xai_api_key)
 
+    @log_calls(level="DEBUG", show_result=True)
     @log_calls(level="INFO")
     @retry(max_retries=15, delay_seconds=120)
     def generate(self, message: str, eval_type: EvalType) -> str:
-        sys_prompt = self.system_prompt.get(eval_type.value, "")
+        sys_prompt = self.system_prompt.get(eval_type, "")
         chat = self.client.chat.create(
             model=self.model_config.model_name,
             temperature=self.model_config.temperature,
@@ -30,4 +31,4 @@ class Grok:
         chat.append(system(sys_prompt))
         chat.append(user(message))
         response = chat.sample()
-        return response.content.strip()
+        return str(response.content.strip())
